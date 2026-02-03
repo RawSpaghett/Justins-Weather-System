@@ -1,0 +1,64 @@
+#include <random> // used to produce a random number
+#include <vector>// dynamic array container
+#include <string> //string operations
+#include <iostream> // Input output operations
+#include <map> //will be used here to search our matrix using strings instead of numbers. Most useful for user input
+
+using namespace std;//makes it to where I dont have to type std::cout just cout
+
+//Intializing
+
+//variables
+int currentWeather{};//change this number to change intial weather state
+int currentSeason{};//change this number to change intial season
+int currentDay{0};
+int seasonLength{}; //change this number to change how long seasons last
+bool ynContinue{};
+
+//random system
+std::random_device spark; // requests random data from the hardware (CPU voltage, keystrokes, etc), increases "randomness"
+std::mt19937_64 randomEngine(spark()); //the actual random generator using 64 mersenne twister from 2000
+
+//Seasonal map
+//seasons = prefix,(map.std(std.string,int)); C# defaults to string if no third argument
+std::map<std::string,int>Season = 
+{ {"spring",0},{"summer",1},{"fall",2},{"winter",3}};
+
+//Seasonal matrices
+double springMatrix[3][3] = 
+{
+    {0,0,0},
+    {0,0,0},
+    {0,0,0}
+};
+
+double summerMatrix[3][3] = 
+{
+    {0,0,0},
+    {0,0,0},
+    {0,0,0}
+};
+
+double fallMatrix[3][3] = 
+{
+    {0,0,0},
+    {0,0,0},
+    {0,0,0}
+};
+
+double summerMatrix[3][3] = 
+{
+    {0,0,0},
+    {0,0,0},
+    {0,0,0}
+};
+
+void MarkovsFunction()
+{
+
+}
+
+int main()
+{
+    
+}
