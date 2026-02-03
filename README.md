@@ -11,3 +11,11 @@ Key points
 Provides output to external weather system
 Linearly Interpolated Seasons
 Realistic weather patterns
+
+Resources
+Intro to markovs chain
+https://calcworkshop.com/vector-spaces/markov-chain-applications/
+C++ standard library headers
+https://en.cppreference.com/w/cpp/headers.html
+Differences between c# and c++
+https://www.geeksforgeeks.org/c-sharp/c-vs-c-sharp/
