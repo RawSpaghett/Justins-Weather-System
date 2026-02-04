@@ -12,6 +12,7 @@ using namespace std;//makes it to where I dont have to type std::cout just cout
 int currentWeather{};//change this number to change intial weather state
 int currentSeason{};//change this number to change intial season
 int currentDay{0};
+int monthManager{0};
 int seasonLength{}; //change this number to change how long seasons last
 bool ynContinue{};
 
@@ -25,6 +26,11 @@ std::map<std::string,int>Season =
 { {"spring",0},{"summer",1},{"fall",2},{"winter",3}};
 
 //Seasonal matrices
+//{SUNNY,CLOUDY,RAINY} SUNNY
+//{SUNNY,CLOUDY,RAINY} CLOUDY
+//{SUNNY,CLOUDY,RAINY} RAINY
+
+//mix with rain favor
 double springMatrix[3][3] = 
 {
     {0,0,0},
@@ -32,6 +38,7 @@ double springMatrix[3][3] =
     {0,0,0}
 };
 
+//rainiest
 double summerMatrix[3][3] = 
 {
     {0,0,0},
@@ -39,6 +46,7 @@ double summerMatrix[3][3] =
     {0,0,0}
 };
 
+//mix with cloudy favor
 double fallMatrix[3][3] = 
 {
     {0,0,0},
@@ -46,19 +54,36 @@ double fallMatrix[3][3] =
     {0,0,0}
 };
 
-double summerMatrix[3][3] = 
+//cloudiest
+double winterMatrix[3][3] = 
 {
     {0,0,0},
     {0,0,0},
     {0,0,0}
 };
 
-void MarkovsFunction()
+void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int &CurrentDay) 
+//& are references to the actual variable, in C++ the variables are function independant 
 {
+    if(MonthManager > SeasonLength)
+    {
+        CurrentSeason += 1;
+        MonthManager = 0;
+        if(CurrentSeason > 3)
+        {
+            CurrentSeason = 0;
+        }
+    }
+    MonthManager += 1;
+    CurrentDay += 1;
+}
 
+void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,int &SeasonLength, int &CurrentDay)
+{
+   SeasonManager(SeasonLength,CurrentSeason,MonthManager,CurrentDay);
 }
 
 int main()
 {
-    
+
 }
