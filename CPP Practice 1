@@ -30,60 +30,51 @@ std::map<std::string,int>Season =
 //{SUNNY,CLOUDY,RAINY} CLOUDY
 //{SUNNY,CLOUDY,RAINY} RAINY
 
-//mix with rain favor
-double springMatrix[3][3] = 
+double probabilityMatrix[4][3][3] =
 {
-    {0,0,0},
-    {0,0,0},
-    {0,0,0}
+{{},{},{}}, //spring, mix rain favor
+{{},{},{}},//summer, rain favor
+{{},{},{}},//fall, mix cloudy favor
+{{},{},{}}//winter, cloudy favor
 };
 
-//rainiest
-double summerMatrix[3][3] = 
-{
-    {0,0,0},
-    {0,0,0},
-    {0,0,0}
-};
 
-//mix with cloudy favor
-double fallMatrix[3][3] = 
+int GetAdjacent(int CurrentSeason, int Direction) //Lerp helper function
 {
-    {0,0,0},
-    {0,0,0},
-    {0,0,0}
-};
+    //1 is forwards -1 is backwards
+    return (CurrentSeason + Direction - 4) % 4; //modulus makes sure it is always less than 4
+}
 
-//cloudiest
-double winterMatrix[3][3] = 
+void LinearInterpolator(int CurrentSeason, int SeasonLength, int MonthManager) // Linearly interpolates between seasons use the SeasonLength as a reference point
 {
-    {0,0,0},
-    {0,0,0},
-    {0,0,0}
-};
+    //using SeasonLength as a weight reference, take the closest season (rounded down or up based on the center of the seasonlength) 
+    //and create basically an average between the two seasons probabilities. The closer the middle of a season is, the heavier its 
+    //probabilities weigh in the calculation.
+}
 
 void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int &CurrentDay) 
 //& are references to the actual variable, in C++ the variables are function independant 
 {
-    if(MonthManager > SeasonLength)
+    if(MonthManager > SeasonLength) //if the season is over, reset the counter and move to the next season
     {
         CurrentSeason += 1;
         MonthManager = 0;
-        if(CurrentSeason > 3)
+        if(CurrentSeason > 3) // if its outside the array (winter) reset to spring
         {
             CurrentSeason = 0;
         }
     }
-    MonthManager += 1;
-    CurrentDay += 1;
+    MonthManager += 1; //add day to season
+    CurrentDay += 1;//add to overall day count
 }
 
 void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,int &SeasonLength, int &CurrentDay)
 {
    SeasonManager(SeasonLength,CurrentSeason,MonthManager,CurrentDay);
+   LinearInterpolator(SeasonLength,CurrentSeason,MonthManager);
 }
 
-int main()
+void main()
 {
-
+ 
 }
