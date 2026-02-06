@@ -18,10 +18,11 @@ bool ynContinue{};
 
 //random system
 std::random_device spark; // requests random data from the hardware (CPU voltage, keystrokes, etc), increases "randomness"
-std::mt19937_64 randomEngine(spark()); //the actual random generator using 64 mersenne twister from 2000
+std::mt19937_64 randomEngine(spark()); //the actual random generator using 64-bit mersenne twister from year 2000
 
 //Seasonal map
 //seasons = prefix,(map.std(std.string,int)); C# defaults to string if no third argument
+//like enum
 std::map<std::string,int>Season = 
 { {"spring",0},{"summer",1},{"fall",2},{"winter",3}};
 
@@ -38,21 +39,67 @@ double probabilityMatrix[4][3][3] =
 {{},{},{}}//winter, cloudy favor
 };
 
+//{SUNNY,CLOUDY,RAINY}
+double interpolatedMatrix[3][3] =
+{
+{0,0,0},
+{0,0,0},
+{0,0,0}
+};
 
+//completed
 int GetAdjacent(int CurrentSeason, int Direction) //Lerp helper function
 {
     //1 is forwards -1 is backwards
-    return (CurrentSeason + Direction - 4) % 4; //modulus makes sure it is always less than 4
+    return (CurrentSeason + Direction + 4) % 4; //modulus makes sure it is always less than 4
 }
 
+//completed
 void LinearInterpolator(int CurrentSeason, int SeasonLength, int MonthManager) // Linearly interpolates between seasons use the SeasonLength as a reference point
 {
-    //using SeasonLength as a weight reference, take the closest season (rounded down or up based on the center of the seasonlength) 
-    //and create basically an average between the two seasons probabilities. The closer the middle of a season is, the heavier its 
-    //probabilities weigh in the calculation.
-}
+    //three possbilities, Previous -> current, true (one day), and current -> next
+    double midpoint = SeasonLength / 2.0;
+    double ap; //the heart of the "percentage" blend between seasons, adjacent percentage
+    int adjacent;
 
-void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int &CurrentDay) 
+    if(MonthManager < midpoint) //First half
+    {
+        adjacent = GetAdjacent(CurrentSeason,-1); //get previous season
+        ap = (static_cast<double>(MonthManager))/midpoint; //converts to double to avoid error, divide by midpoint to get a number between 0-1
+    }
+
+    else if (MonthManager > midpoint) //second half
+    {
+        adjacent = GetAdjacent(CurrentSeason,1); //get post season
+        ap = (static_cast<double>(MonthManager) - midpoint)/midpoint; 
+    }
+
+    else
+    {
+        ap = 0.0; //"true" season
+        adjacent = CurrentSeason; //prevents errors during true day, otherwise mathmatically would end up nullifying it instead
+    }
+
+    double p = 1.0 - ap; //percentage
+
+    //sizeof returns BYTES not number of ELEMENTS, so divide by the next one down to determine actual number of elements. Wont work for non-uniform matrices
+    int ROWS = sizeof(probabilityMatrix[0])/sizeof(probabilityMatrix[0][0]);
+    int COLUMNS =  sizeof(probabilityMatrix[0][0])/sizeof(probabilityMatrix[0][0][0]);
+    //This is scalable, the original matrix just needs to be tweaked for scalabilitya
+    
+    //iterate through our matrix and weigh values and fill in accordingly
+    for (int r = 0; r < ROWS;r++)
+    {
+        for (int c = 0; c < COLUMNS;c++)
+        {
+            interpolatedMatrix[r][c] = (probabilityMatrix[CurrentSeason][r][c] * p) + (probabilityMatrix[adjacent][r][c] * ap);
+        }
+    }
+    
+ }
+
+//completed
+void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int &CurrentDay) //completed
 //& are references to the actual variable, in C++ the variables are function independant 
 {
     if(MonthManager > SeasonLength) //if the season is over, reset the counter and move to the next season
@@ -68,13 +115,22 @@ void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int 
     CurrentDay += 1;//add to overall day count
 }
 
+//completed
 void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,int &SeasonLength, int &CurrentDay)
 {
    SeasonManager(SeasonLength,CurrentSeason,MonthManager,CurrentDay);
    LinearInterpolator(SeasonLength,CurrentSeason,MonthManager);
+   
+   //loop through proper row and compare numbers to randomnumber to determine weather
+   //while it may be easier to manually check, I want to try and make this scalable to different types of weather
+   
 }
 
 void main()
 {
- 
+ //take input for
+ //Season
+ //Current days weather
+
+ MarkovsFunction(currentWeather,currentSeason,monthManager,seasonLength,currentDay);
 }
