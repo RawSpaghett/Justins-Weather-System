@@ -13,18 +13,42 @@ int currentWeather{};//change this number to change intial weather state
 int currentSeason{};//change this number to change intial season
 int currentDay{0};
 int monthManager{0};
-int seasonLength{}; //change this number to change how long seasons last
+int seasonLength{30}; //change this number to change how long seasons last
 bool ynContinue{};
 
 //random system
 std::random_device spark; // requests random data from the hardware (CPU voltage, keystrokes, etc), increases "randomness"
 std::mt19937_64 randomEngine(spark()); //the actual random generator using 64-bit mersenne twister from year 2000
 
-//Seasonal map
-//seasons = prefix,(map.std(std.string,int)); C# defaults to string if no third argument
-//like enum
-std::map<std::string,int>Season = 
-{ {"spring",0},{"summer",1},{"fall",2},{"winter",3}};
+//string to int maps
+std::map <std::string,int> SeasonI = 
+{ 
+    {"spring", 0},
+    {"summer", 1},
+    {"fall",   2},
+    {"winter", 3}
+};
+
+std::map <std::string,int> WeatherI = 
+{ 
+    {"sunny", 0},
+    {"cloudy",1},
+    {"rainy", 2}
+};
+
+//used for int to string
+std::map<int, std::string> SeasonO = { 
+    {0, "spring"}, 
+    {1, "summer"}, 
+    {2, "fall"}, 
+    {3, "winter"} 
+};
+
+std::map<int, std::string> WeatherO = { 
+    {0, "sunny"}, 
+    {1, "cloudy"}, 
+    {2, "rainy"} 
+};
 
 //Seasonal matrices
 //{SUNNY,CLOUDY,RAINY} SUNNY
@@ -46,6 +70,8 @@ double interpolatedMatrix[3][3] =
 {0,0,0},
 {0,0,0}
 };
+
+//==========================================================================================
 
 //completed
 int GetAdjacent(int CurrentSeason, int Direction) //Lerp helper function
@@ -115,7 +141,7 @@ void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int 
     CurrentDay += 1;//add to overall day count
 }
 
-//completed
+
 void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,int &SeasonLength, int &CurrentDay)
 {
    SeasonManager(SeasonLength,CurrentSeason,MonthManager,CurrentDay);
@@ -126,11 +152,77 @@ void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,in
    
 }
 
+int ConvertInput(int Type, string Key) //user input to numbers, easier of the two
+{
+    
+    if (Type == 1) //seasons
+    {
+        auto result = SeasonI.find(Key); //uses auto to avoid excessive code involved with maps
+        return result->second; //return second value, aka number
+    }
+
+    if (Type == 2) //weather
+    {
+        auto result = WeatherI.find(Key); //same thing just for weather
+        return result->second; 
+    }
+}
+
+string ConvertOutput(int Type, int Key)// numbers to text
+{
+    if (Type == 1) //seasons
+    {
+        auto result = SeasonO.find(Key); //same thing just for weather
+        return result->second; 
+    }
+
+    if (Type == 2) //weather
+    {
+         auto result = WeatherO.find(Key); //same thing just for weather
+        return result->second; 
+    }
+} 
+
+//==========================================================================================
+
 void main()
 {
- //take input for
- //Season
- //Current days weather
+    cout << "Welcome to Justin's Weather system! \n I created this system in C++ using Markovs Chain theory to simuluate realistic weather patterns \n How many days would you like to simulate?";
 
- MarkovsFunction(currentWeather,currentSeason,monthManager,seasonLength,currentDay);
+    //determine user inputs
+    int loop;
+    cin >> loop;
+
+    //converts input to numbers for the system
+    string inputSeason;
+    cout << "\nWhat is the current season?";
+    cin >> inputSeason;
+    currentSeason = ConvertInput(1,inputSeason);
+
+    string inputWeather;
+    cout << "\nWhat is todays weather??";
+    cin >> inputWeather;
+    currentWeather = ConvertInput(2,inputWeather);
+    
+
+    //the heart of the system loop
+    for (int i = 0; i <= loop; i++)
+    {
+        //print each days' information
+        cout << "Day " << i << ": ";
+        if(currentWeather = 0) //sunny
+        {
+            cout << "Sunny";
+        }
+        else if(currentWeather = 1)//cloudy
+        {
+            cout << "Cloudy";
+        }
+        else if(currentWeather = 2)//rainy
+        {
+            cout << "Rainy";
+        }
+
+        MarkovsFunction(currentWeather,currentSeason,monthManager,seasonLength,currentDay);
+    }
 }
