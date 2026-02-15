@@ -3,22 +3,24 @@
 #include <string> //string operations
 #include <iostream> // Input output operations
 #include <map> //will be used here to search our matrix using strings instead of numbers. Most useful for user input
+#include <iterator> //for size()
 
 using namespace std;//makes it to where I dont have to type std::cout just cout
 
 //Intializing
 
 //variables
-int currentWeather{};//change this number to change intial weather state
-int currentSeason{};//change this number to change intial season
-int currentDay{0};
+int currentWeather{1};//change this number to change intial weather state
+int currentSeason{1};//change this number to change intial season
+int currentDay{1};
 int monthManager{0};
 int seasonLength{30}; //change this number to change how long seasons last
 bool ynContinue{};
 
 //random system
-std::random_device spark; // requests random data from the hardware (CPU voltage, keystrokes, etc), increases "randomness"
+std::random_device spark; // requests random data from the hardware (CPU voltage, keystrokes, etc), increases "randomness", VERY INTENSIVE keep outside of loop or static
 std::mt19937_64 randomEngine(spark()); //the actual random generator using 64-bit mersenne twister from year 2000
+std::uniform_real_distribution <double> randomN(0.0,1.0); //actually creates the random number
 
 //string to int maps
 std::map <std::string,int> SeasonI = 
@@ -141,17 +143,26 @@ void SeasonManager (int SeasonLength,int &CurrentSeason, int &MonthManager, int 
     CurrentDay += 1;//add to overall day count
 }
 
-
-void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,int &SeasonLength, int &CurrentDay)
+void MarkovsFunction(int &CurrentWeather,int &CurrentSeason,int &MonthManager,int &SeasonLength, int &CurrentDay)//the bread and butter
 {
-   SeasonManager(SeasonLength,CurrentSeason,MonthManager,CurrentDay);
-   LinearInterpolator(SeasonLength,CurrentSeason,MonthManager);
-   
-   //loop through proper row and compare numbers to randomnumber to determine weather
-   //while it may be easier to manually check, I want to try and make this scalable to different types of weather
-   
+    int tommorowWeather;
+    SeasonManager(SeasonLength,CurrentSeason,MonthManager,CurrentDay); //manage season first
+    LinearInterpolator(SeasonLength,CurrentSeason,MonthManager); //then linearly interpolate
+    double dice = randomN(randomEngine); //calling our number generator, NOT resetting our spark
+
+ 
+     for (int j = 0; j < (sizeof(interpolatedMatrix[CurrentWeather])/sizeof(interpolatedMatrix[CurrentWeather][j])); j++) //columns
+     {
+        if (dice <= interpolatedMatrix[CurrentWeather][j])
+        {
+            tommorowWeather = interpolatedMatrix[CurrentWeather][j];
+        }
+     }
+    
+    CurrentWeather = tommorowWeather;
 }
 
+//completed
 int ConvertInput(int Type, string Key) //user input to numbers, easier of the two
 {
     
@@ -168,6 +179,7 @@ int ConvertInput(int Type, string Key) //user input to numbers, easier of the tw
     }
 }
 
+//completed
 string ConvertOutput(int Type, int Key)// numbers to text
 {
     if (Type == 1) //seasons
@@ -204,25 +216,13 @@ void main()
     cin >> inputWeather;
     currentWeather = ConvertInput(2,inputWeather);
     
-
     //the heart of the system loop
-    for (int i = 0; i <= loop; i++)
+    for (int i = 1; i <= loop; i++)
     {
         //print each days' information
-        cout << "Day " << i << ": ";
-        if(currentWeather = 0) //sunny
-        {
-            cout << "Sunny";
-        }
-        else if(currentWeather = 1)//cloudy
-        {
-            cout << "Cloudy";
-        }
-        else if(currentWeather = 2)//rainy
-        {
-            cout << "Rainy";
-        }
+        cout << "Day " << i << "of "<<currentSeason<<": ";
+        cout << ConvertOutput(2,currentWeather);
 
-        MarkovsFunction(currentWeather,currentSeason,monthManager,seasonLength,currentDay);
+        MarkovsFunction(currentWeather,currentSeason,monthManager,seasonLength,currentDay); 
     }
 }
